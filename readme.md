@@ -132,10 +132,28 @@ Example:
     - `original_amount`
     - `description`
 
-Example:
+Example Request:
 ````json
 {
 	"description": "A loan for soda pop.",
 	"original_amount": "1000.00"
+}
+````
+
+#### Calculate Interest
+
+- Endpoint: `loans/calculate_interest`
+
+Example Request:
+````json
+{
+	"original_amount": "1000.00"
+}
+````
+
+Example Response:
+````json
+{
+    "interest": 200
 }
 ````

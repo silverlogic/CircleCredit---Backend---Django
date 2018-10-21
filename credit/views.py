@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -67,6 +68,11 @@ class LoanViewSet(mixins.ListModelMixin,
         else:
             serializer = LoanSerializer(loan)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def calculate_interest(self, request):
+        user = self.request.user
+        return Response({"interest": calculate_interest(user.credit, request.data['original_amount'])})
 
 
 class VouchViewSet(mixins.RetrieveModelMixin,
