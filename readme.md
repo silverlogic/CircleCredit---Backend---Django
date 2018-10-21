@@ -4,9 +4,17 @@ Base URL: http://silverlogic.ngrok.io/api/
 
 Auth Tokens:
 
-Anna: d01f9cf6936f56b6e09bcf6fbd3ee22f926fa59a	
-Chris: e07af9db0dd265f1424cf7da6e68d2d03bb8260d	
-Kevin: e836b5c3019d6c88148e08504376f136cc7cedb1
+Anna: `d01f9cf6936f56b6e09bcf6fbd3ee22f926fa59a`
+
+Chris: `e07af9db0dd265f1424cf7da6e68d2d03bb8260d`	
+
+Kevin: `e836b5c3019d6c88148e08504376f136cc7cedb1`
+
+- [Credit Factors](#credit-factors)
+- [Credit](#credit)
+- [Loans](#loan)
+- [Device](#devices)
+- [Users](#users)
 
 ## Credit Factors
 
