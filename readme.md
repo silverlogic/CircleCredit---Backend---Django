@@ -130,7 +130,7 @@ Example:
 - Authentication: Logged in as the user you want to create a loan for
 - Properties:
     - `original_amount`
-    - `description`
+    - `description`: **Optional**
 
 Example Request:
 ````json
@@ -155,6 +155,26 @@ Example Response:
 ````json
 {
     "interest": 200
+}
+````
+
+## Devices
+
+#### Create Device
+
+- Endpoint: `devices/`
+- Method: POST
+- Authentication: Logged in
+
+Request:
+````json
+{
+    "registration_id": [
+        "This field is required."
+    ],
+    "type": [
+        "This field is required."
+    ]
 }
 ````
 
@@ -263,7 +283,7 @@ Example response:
     "amount": "100.00",
     "loan": 3,
     "vouching_user": 2,
-    "status": "invited"
+    "status": "INVITED"
 }
 ```
 

@@ -14,3 +14,4 @@ class UserViewSet(viewsets.ModelViewSet):
         friends = user.friends
         serializer = UserSerializer(friends, many=True)
         return Response(serializer.data)
+

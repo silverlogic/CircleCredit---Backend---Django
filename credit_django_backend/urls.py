@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
+
 from credit.router import urlpatterns as credit_patterns
 from users.router import urlpatterns as user_patterns
 
 api_patterns = [
-    path('auth/', include('authentication.urls'))
+    path('auth/', include('authentication.urls')),
+    path('devices/', FCMDeviceAuthorizedViewSet.as_view({'post': 'create'}), name='create_fcm_device'),
 ]
 
 api_patterns += credit_patterns

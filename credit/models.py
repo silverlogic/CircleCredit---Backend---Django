@@ -31,7 +31,7 @@ LOAN_STATUS = (('PENDING', 'pending'), ('ACTIVE', 'active',), ('PAID', 'paid'))
 
 
 class Loan(models.Model):
-    status = models.CharField(choices=LOAN_STATUS, max_length=12, default='pending')
+    status = models.CharField(choices=LOAN_STATUS, max_length=12, default='PENDING')
     credit = models.ForeignKey('credit.Credit', on_delete=models.CASCADE, related_name='loans')
     original_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
     interest = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
@@ -57,7 +57,7 @@ VOUCH_STATUS = (('INVITED', 'invited',), ('ACCEPTED', 'accepted'), ('DECLINED', 
 
 
 class Vouch(models.Model):
-    status = models.CharField(choices=VOUCH_STATUS, max_length=12, default='invited')
+    status = models.CharField(choices=VOUCH_STATUS, max_length=12, default="INVITED")
     amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', blank=True)
     loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='vouches')
     vouching_user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=False)
