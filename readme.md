@@ -41,6 +41,24 @@ Example:
 ]
 ````
 
+#### Synchrony Credit Score
+
+- Endpoint: `synchrony-credit-score/`
+- Method: GET
+- Authentication: None
+
+Example:
+````json
+{
+    "syfCreditScore": "600",
+    "ficoScore": "600",
+    "delinquentAccounts": "1",
+    "bankruptAccounts": "0",
+    "averageAccountAge": "3",
+    "paymentHistory": "0.75"
+}
+````
+
 ## Credit
 
 #### Retrieve

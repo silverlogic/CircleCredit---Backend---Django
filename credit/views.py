@@ -1,5 +1,9 @@
 import braintree
+import json
+
+import requests as requests
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 from fcm_django.models import FCMDevice
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
@@ -25,6 +29,12 @@ class CreditViewSet(mixins.RetrieveModelMixin,
         credit = Credit.objects.get(user=user)
         serializer = CreditSerializer(credit)
         return Response(serializer.data)
+
+
+def synchrony_credit_score(request):
+    response = requests.get('https://api-stg.syf.com/m2020/credit/customers/1/profile',
+                             headers={'Authorization': f'Bearer {settings.SYNCHRONY_ACCESS_TOKEN}'})
+    return JsonResponse(response.json())
 
 
 class CreditImpactViewSet(mixins.ListModelMixin,
@@ -92,34 +102,56 @@ class LoanViewSet(mixins.ListModelMixin,
             return Response({'error': 'Could not find loan to update.'}, status=status.HTTP_400_BAD_REQUEST)
         if loan_status == 'ACTIVE':
             # Go through loan and make investments active, and post payment
-            loan.status = loan_status
-            loan.save()
             if loan.investments.all() is not None:
                 for investment in loan.investments.all():
-                    investment.status = 'ACTIVE'
-                    gateway = braintree.BraintreeGateway(
-                        braintree.Configuration(
-                            braintree.Environment.Sandbox,
-                            merchant_id=settings.BRAINTREE_MERCHANT_ID,
-                            public_key=settings.BRAINTREE_PUBLIC_KEY,
-                            private_key=settings.BRAINTREE_PRIVATE_KEY
+                    if investment.status != 'ACTIVE':
+                        investment.status = 'ACTIVE'
+                        gateway = braintree.BraintreeGateway(
+                            braintree.Configuration(
+                                braintree.Environment.Sandbox,
+                                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                                private_key=settings.BRAINTREE_PRIVATE_KEY
+                            )
                         )
-                    )
-                    gateway.transaction.sale({
-                        "amount": str(investment.original_amount).replace('$', ''),
-                        "payment_method_nonce": investment.credit.user.paypal_token,
-                        "options": {
-                            "submit_for_settlement": True
-                        }
-                    })
-                    investment.save()
+                        response = gateway.transaction.sale({
+                            'amount': str(investment.original_amount).replace('$', ''),
+                            'payment_method_nonce': investment.credit.user.paypal_token,
+                            'options': {
+                                'submit_for_settlement': True
+                            }
+                        })
+                        if response.is_success is not True:
+                            return Response({'error': 'Failed to payout investments.'},
+                                            status=status.HTTP_400_BAD_REQUEST)
+                        investment.save()
+            # Now, use PayPal Payouts to transfer loan from CreditCircle to borrower
+            data = {
+                'sender_batch_header': {'sender_batch_id': '2014021801', 'email_subject': 'CreditCircle Loan Payment',
+                                        'email_message': 'Your CreditCircle loan has been credited to your PayPal account.'},
+                'items': [{'recipient_type': 'EMAIL',
+                           'amount': {'value': str(loan.original_amount).replace('$', '').replace(',', ''),
+                                      'currency': 'USD'},
+                           'note': 'Thanks for using CreditCircle!', 'sender_item_id': '2014021801',
+                           'receiver': loan.credit.user.email}]
+            }
+            print(str(loan.original_amount).replace('$', ''))
+            json_data = json.dumps(data)
+            response = requests.post('https://api.sandbox.paypal.com/v1/payments/payouts',
+                                     headers={'Content-Type': 'application/json',
+                                              'Authorization': f'Bearer {settings.PAYPAL_ACCESS_TOKEN}'},
+                                     data=json_data)
+            if not response.ok:
+                return Response({'error': 'Failed to payout loan.'}, status=status.HTTP_400_BAD_REQUEST)
+            loan.status = loan_status
+            loan.save()
         loan_serializer = LoanSerializer(loan)
         return Response(loan_serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def calculate_interest(self, request):
         user = self.request.user
-        return Response({"interest": calculate_interest(user.credit, request.data['original_amount'])})
+        return Response({'interest': calculate_interest(user.credit, request.data['original_amount'])})
 
     @action(detail=True, methods=['get'])
     def vouches(self, request, pk):

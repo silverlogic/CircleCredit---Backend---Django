@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework import routers
 
-from credit.views import CreditViewSet, CreditImpactViewSet, LoanViewSet, InvestmentViewSet, VouchViewSet
+from credit.views import CreditViewSet, CreditImpactViewSet, LoanViewSet, InvestmentViewSet, VouchViewSet, \
+    synchrony_credit_score
 
 router = routers.SimpleRouter()
 router.register(r'loans', LoanViewSet, 'loan')
@@ -12,4 +13,5 @@ urlpatterns = router.urls
 urlpatterns += [
     path('credit/', CreditViewSet.as_view({'get': 'retrieve'})),
     path('credit-factors/', CreditImpactViewSet.as_view({'get': 'list'})),
+    path('synchrony-credit-score/', synchrony_credit_score),
 ]
