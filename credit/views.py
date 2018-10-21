@@ -228,6 +228,7 @@ class VouchViewSet(mixins.RetrieveModelMixin,
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         vouch.status = vouching_status
+        vouch.amount = request.data['amount']
         vouch.save()
         # Get amounts vouched and invested
         investment_amount = request.data['investment']
