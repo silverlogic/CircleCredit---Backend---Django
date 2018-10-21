@@ -16,12 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from credit.router import urlpatterns as credit_patterns
+from users.router import urlpatterns as user_patterns
 
 api_patterns = [
     path('auth/', include('authentication.urls'))
 ]
 
 api_patterns += credit_patterns
+api_patterns += user_patterns
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),

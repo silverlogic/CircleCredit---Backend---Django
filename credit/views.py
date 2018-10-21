@@ -67,7 +67,7 @@ class LoanViewSet(mixins.ListModelMixin,
             serializer = PublicLoanSerializer(loan)
         else:
             serializer = LoanSerializer(loan)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def calculate_interest(self, request):
@@ -86,6 +86,18 @@ class VouchViewSet(mixins.RetrieveModelMixin,
         user = self.request.user
         return user.credit.credit_impacts.vouches.all()
 
+    def create(self, request):
+        # SEND PUSH TO FIREBASE
+        serializer = VouchSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request):
+        pass
+        # If accepted, add credit factors
+        # If declined, delete object
 
 class InvestmentViewSet(mixins.RetrieveModelMixin,
                         mixins.CreateModelMixin,

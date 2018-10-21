@@ -3,5 +3,6 @@ from django.db import models
 
 
 class User(AbstractUser):
-    friends = models.ManyToManyField("self", blank=True)
-    description = models.CharField(max_length=24, blank=True)
+    friends = models.ManyToManyField("self", blank=True, related_name='friends')
+    job = models.CharField(max_length=24, blank=True)
+    stars = models.IntegerField(blank=True, default=0)

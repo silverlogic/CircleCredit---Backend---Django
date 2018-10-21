@@ -157,3 +157,38 @@ Example Response:
     "interest": 200
 }
 ````
+
+## Users
+
+#### List Friends
+
+- Endpoint: `users/`
+- Method: GET
+- Authentication: Logged in as user you want friends
+
+Example response:
+````json
+[
+    {
+        "first_name": "Chris",
+        "last_name": "Johnston",
+        "stars": 3,
+        "job": "Soda Vendor",
+        "id": 2
+    },
+    {
+        "first_name": "Kevin",
+        "last_name": "Lavi",
+        "stars": 4,
+        "job": "Hat Vendor",
+        "id": 3
+    },
+    {
+        "first_name": "Rob",
+        "last_name": "Doischen",
+        "stars": 2,
+        "job": "Carpet Vendor",
+        "id": 4
+    }
+]
+````

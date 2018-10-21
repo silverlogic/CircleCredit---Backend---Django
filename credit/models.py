@@ -27,7 +27,11 @@ class CreditImpact(models.Model):
         return f'Credit impact on {self.credit.user.first_name} {self.credit.user.last_name}\'s Credit'
 
 
+LOAN_STATUS = (('PENDING', 'pending'), ('ACTIVE', 'active',), ('PAID', 'paid'))
+
+
 class Loan(models.Model):
+    status = models.CharField(choices=LOAN_STATUS, max_length=12, default='pending')
     credit = models.ForeignKey('credit.Credit', on_delete=models.CASCADE, related_name='loans')
     original_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
     interest = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
@@ -48,16 +52,21 @@ class Payment(models.Model):
         return f'Payment for Loan {self.loan.pk}'
 
 
+VOUCH_STATUS = (('INVITED', 'invited',), ('ACCEPTED', 'accepted'), ('DECLINED', 'declined'))
+
+
 class Vouch(models.Model):
-    amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
+    status = models.CharField(choices=VOUCH_STATUS, max_length=12, default='invited')
+    amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', blank=True)
     loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='vouches')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)
     credit_impact = models.OneToOneField('credit.CreditImpact', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name_plural = 'vouches'
 
     def __str__(self):
-        return f'Vouch from {self.credit_impact.credit.user.first_name} {self.credit_impact.credit.user.last_name} to' \
+        return f'Vouch from {self.user.first_name} {self.user.last_name} to' \
                f'to {self.loan.credit.user.first_name} {self.loan.credit.user.last_name}'
 
 
