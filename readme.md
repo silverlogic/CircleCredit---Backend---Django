@@ -10,6 +10,8 @@ Chris: `e07af9db0dd265f1424cf7da6e68d2d03bb8260d`
 
 Kevin: `e836b5c3019d6c88148e08504376f136cc7cedb1`
 
+Rob: `fbed0dace38f8dd86b7527c185a59d40ddab1fd1`
+
 - [Credit Factors](#credit-factors)
 - [Credit](#credit)
 - [Loans](#loan)
@@ -275,12 +277,13 @@ Example response:
 - Endpoint: `vouches/`
 - Method: POST
 - Authentication: Logged in as loan borrower
+- Properties:
+    - `amount`: **Optional** Default is $20
 
 Example request:
 ````json
 {
 	"vouching_user": 2,
-	"amount": 100,
 	"loan": 3
 }
 ````
@@ -288,7 +291,7 @@ Example request:
 Example response:
 ```json
 {
-    "amount": "100.00",
+    "amount": "20.00",
     "loan": 3,
     "vouching_user": 2,
     "status": "INVITED"
