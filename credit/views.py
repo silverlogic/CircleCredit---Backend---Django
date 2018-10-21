@@ -5,9 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from credit.calculations import calculate_interest
-from credit.models import Credit, CreditImpact, Loan
+from credit.models import Credit, CreditImpact, Loan, Vouch
 from credit.serializers import CreditSerializer, CreditImpactSerializer, VouchSerializer, InvestmentSerializer, \
-    LoanSerializer, PublicLoanSerializer
+    LoanSerializer, PublicLoanSerializer, LoanVouchSerializer
 
 
 class CreditViewSet(mixins.RetrieveModelMixin,
@@ -74,17 +74,34 @@ class LoanViewSet(mixins.ListModelMixin,
         user = self.request.user
         return Response({"interest": calculate_interest(user.credit, request.data['original_amount'])})
 
+    @action(detail=True, methods=['get'])
+    def vouches(self, request, pk):
+        user = self.request.user
+        try:
+            loan = Loan.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if user == loan.credit.user:
+            serializer = LoanVouchSerializer(loan.vouches, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class VouchViewSet(mixins.RetrieveModelMixin,
+                   mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.UpdateModelMixin,
                    viewsets.GenericViewSet):
     serializer_class = VouchSerializer
     permission_classes = (IsAuthenticated,)
+    queryset = Vouch.objects.all()
 
-    def get_queryset(self):
+    def list(self, request):
         user = self.request.user
-        return user.credit.credit_impacts.vouches.all()
+        vouches = Vouch.objects.filter(user=user)
+        serializer = VouchSerializer(vouches, many=True)
+        return Response(serializer.data)
 
     def create(self, request):
         # SEND PUSH TO FIREBASE
@@ -98,6 +115,7 @@ class VouchViewSet(mixins.RetrieveModelMixin,
         pass
         # If accepted, add credit factors
         # If declined, delete object
+
 
 class InvestmentViewSet(mixins.RetrieveModelMixin,
                         mixins.CreateModelMixin,

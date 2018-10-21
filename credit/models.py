@@ -67,8 +67,7 @@ class Vouch(models.Model):
         verbose_name_plural = 'vouches'
 
     def __str__(self):
-        return f'Vouch from {self.user.first_name} {self.user.last_name} to' \
-               f'to {self.loan.credit.user.first_name} {self.loan.credit.user.last_name}'
+        return 'Vouch'
 
 
 class Investment(Loan):

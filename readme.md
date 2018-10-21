@@ -170,25 +170,47 @@ Example response:
 ````json
 [
     {
-        "first_name": "Chris",
-        "last_name": "Johnston",
+        "name": "Chris Johnston",
         "stars": 3,
         "job": "Soda Vendor",
         "id": 2
     },
     {
-        "first_name": "Kevin",
-        "last_name": "Lavi",
+        "name": "Kevin Lavi",
         "stars": 4,
         "job": "Hat Vendor",
         "id": 3
     },
     {
-        "first_name": "Rob",
-        "last_name": "Doischen",
+        "name": "Rob Doischen",
         "stars": 2,
         "job": "Carpet Vendor",
         "id": 4
+    }
+]
+````
+
+## Vouches
+
+#### List Vouches for a Loan
+
+- Endpoint: `loans/{id}/vouches`
+- Method: GET
+- Authentication: Logged in as loan borrower
+
+Example response:
+````json
+[
+    {
+        "amount": "100.00",
+        "loan": 2,
+        "user": {
+            "name": "Chris Johnston",
+            "stars": 3,
+            "job": "Soda Vendor",
+            "id": 2
+        },
+        "status": "INVITED"
     }
 ]
 ````

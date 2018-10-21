@@ -2,6 +2,7 @@ from djmoney.contrib.django_rest_framework import MoneyField
 from rest_framework import serializers
 
 from credit.models import Investment, Vouch, CreditImpact, Loan, Credit
+from users.serializers import UserSerializer
 
 
 class CreditSerializer(serializers.ModelSerializer):
@@ -43,12 +44,16 @@ class PublicLoanSerializer(serializers.ModelSerializer):
 
 
 class VouchSerializer(serializers.ModelSerializer):
-    loan = serializers.SerializerMethodField
-
     class Meta:
         model = Vouch
         fields = ('amount', 'loan',)
 
+class LoanVouchSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Vouch
+        fields = ('amount', 'loan', 'user', 'status')
 
 class InvestmentSerializer(serializers.ModelSerializer):
     class Meta:
