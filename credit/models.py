@@ -37,6 +37,7 @@ class Loan(models.Model):
     interest = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
     paid_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
     description = models.CharField(max_length=256, blank=True)
+    due_date = models.DateTimeField(null=True)
 
     def __str__(self):
         return f'Loan for {self.credit.user.first_name} {self.credit.user.last_name}'
