@@ -24,7 +24,8 @@ Example:
 ````json
 [
     {
-        'impact': '-100.00', 'source': 'VOUCH'
+        "impact": "-100.00", 
+        "source": "VOUCH"
     }
 ]
 ````
@@ -42,7 +43,7 @@ Example:
 Example:
 ````json
 {
-    'amount': '1000.00'
+    "amount": "1000.00"
 }
 ````
 
@@ -117,7 +118,7 @@ Example:
         "firstname": "Chris",
         "lastname": "Johnston"
     },
-    "description": "Loan for plastic cups."
-    "id': 3
+    "description": "Loan for plastic cups.",
+    "id": 3
 }
 ````
