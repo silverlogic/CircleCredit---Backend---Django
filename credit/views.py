@@ -1,3 +1,5 @@
+import uuid
+
 import braintree
 import json
 
@@ -15,7 +17,6 @@ from credit.calculations import calculate_interest
 from credit.models import Credit, CreditImpact, Loan, Vouch, Investment
 from credit.serializers import CreditSerializer, CreditImpactSerializer, VouchSerializer, InvestmentSerializer, \
     LoanSerializer, PublicLoanSerializer, LoanVouchSerializer
-from users.models import User
 from users.serializers import UserSerializer
 
 
@@ -34,35 +35,6 @@ class CreditViewSet(mixins.RetrieveModelMixin,
 def synchrony_credit_score(request):
     response = requests.get('https://api-stg.syf.com/m2020/credit/customers/1/profile',
                             headers={'Authorization': f'Bearer {settings.SYNCHRONY_ACCESS_TOKEN}'})
-    return JsonResponse(response.json())
-
-
-def verify_document(request):
-    headers = {"Content-Type": "multipart/form-data", "boundary": "VISA_MESSAGE_BOUNDARY"}
-    body = """
-    --VISA_MESSAGE_BOUNDARY
-    Content-Disposition: form-data; name="jsonMessage"
-    Content-Type: application/json; charset=UTF-8
-    Content-Transfer-Encoding: 8bit
-    {"messageTraceId":"843810ae-d2d2-468d-a302-b516cadfd24a","documentCountryCode":"US"}
-    --VISA_MESSAGE_BOUNDARY
-    Content-Disposition: form-data; name="documentFront"; filename="driversLicense.jpg"
-    Content-Type: image/jpeg
-    Content-Transfer-Encoding: binary
-      [Binary document front goes here]
-    --VISA_MESSAGE_BOUNDARY
-    Content-Disposition: form-data; name="documentBack"; filename="driversLicenseBack.jpg"
-     Content-Type: image/jpeg
-    Content-Transfer-Encoding: binary
-       [Binary document back goes here]
-    --VISA_MESSAGE_BOUNDARY"
-    """
-    response = requests.post('https://sandbox.api.visa.com/identitydocuments/v1/documentauthentication',
-                             verify=(settings.VISA_CA_CERT),
-                             cert=(settings.VISA_CLIENT_CERT, settings.VISA_PRIVATE_KEY),
-                             headers=headers,
-                             auth=(settings.VISA_USER_ID, settings.VISA_USER_PASSWORDA),
-                             data=body)
     return JsonResponse(response.json())
 
 
@@ -164,7 +136,6 @@ class LoanViewSet(mixins.ListModelMixin,
                            'note': 'Thanks for using CreditCircle!', 'sender_item_id': '2014021801',
                            'receiver': loan.credit.user.email}]
             }
-            print(str(loan.original_amount).replace('$', ''))
             json_data = json.dumps(data)
             response = requests.post('https://api.sandbox.paypal.com/v1/payments/payouts',
                                      headers={'Content-Type': 'application/json',
