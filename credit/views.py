@@ -36,7 +36,6 @@ def synchrony_credit_score(request):
                              headers={'Authorization': f'Bearer {settings.SYNCHRONY_ACCESS_TOKEN}'})
     return JsonResponse(response.json())
 
-
 class CreditImpactViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
     serializer_class = CreditImpactSerializer

@@ -4,3 +4,4 @@ venv/
 .DS_STORE
 __pycache__/
 __pycache__/*
+settings.py
