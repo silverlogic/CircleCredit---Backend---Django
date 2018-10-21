@@ -10,6 +10,8 @@ Kevin: e836b5c3019d6c88148e08504376f136cc7cedb1
 
 ## Credit Factors
 
+#### List
+
 - Endpoint: `credit-factors/`
 - Method: GET
 - Authentication: Required. Only returns for current user.
@@ -20,12 +22,16 @@ Kevin: e836b5c3019d6c88148e08504376f136cc7cedb1
 
 Example:
 ``
-{
-    'impact': '-100.00', 'source': 'VOUCH'
-}
+[
+    {
+        'impact': '-100.00', 'source': 'VOUCH'
+    }
+]
 ``
 
 ## Credit
+
+#### Retrieve
 
 - Endpoint: `credit/`
 - Method: GET
@@ -42,7 +48,7 @@ Example:
 
 ## Loan
 
-### List
+#### List
 
 - Endpoint: `loans/`
 - Method: GET
@@ -67,7 +73,7 @@ Example:
 ]
 ``
 
-### Retrieve (Borrower)
+#### Retrieve (Borrower)
 
 - Endpoint: `loans/{id}`
 - Method: GET
@@ -90,7 +96,7 @@ Example:
 }
 ``
 
-### Retrieve (Investor/Cosigner)
+#### Retrieve (Investor/Cosigner)
 
 - Endpoint: `loans/{id}`
 - Method: GET
