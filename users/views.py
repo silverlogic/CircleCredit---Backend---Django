@@ -1,4 +1,6 @@
+import json
 import uuid
+import base64
 import requests
 from django.conf import settings
 from rest_framework import viewsets, status
@@ -29,6 +31,43 @@ class UserViewSet(viewsets.ModelViewSet):
                                  auth=(settings.VISA_USER_ID, settings.VISA_USER_PASSWORD),
                                  data={"documentFront": document_front, "document_back": document_back,
                                        "jsonMessage": {"messageTraceId": transactionId}})
+        return Response(response.json())
+
+    @action(detail=True, methods=['post'])
+    def verify_data(self, request, pk):
+        data = """
+        {
+            "userDataRequest": {
+            "messageTraceId": "ac198ded-e204-4ad9-aae7-bfc55f3a0043",
+            "name": {
+            "first": "Rosetta",
+            "last": "Jones"
+            },
+            "address": {
+            "street": "1000 Main St",
+            "city": "San Francisco",
+            "region": "CA",
+            "country": "US",
+            "postcode": "94107"
+            },
+            "phone": {
+            "countryCode": "1",
+            "number": "4155551234"
+            },
+            "email": {
+            "display": "Rosetta Jones",
+            "address": "abcxyz@example.com"
+            },
+            "ipAddress": "23.200.140.110"
+            }
+        }
+        """
+        response = requests.post('https://sandbox.api.visa.com/userdata/v1/attributes',
+                                 cert=(settings.VISA_CLIENT_CERT, settings.VISA_PRIVATE_KEY),
+                                 auth=(settings.VISA_USER_ID, settings.VISA_USER_PASSWORD),
+                                 headers={"Authorization": base64.b64encode(
+                                     json.dumps({settings.VISA_USER_ID: settings.VISA_USER_PASSWORD}).encode())},
+                                 data=data)
         return Response(response.json())
 
     @action(detail=True, methods=['post'])
