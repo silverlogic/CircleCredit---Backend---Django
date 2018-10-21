@@ -21,13 +21,13 @@ Kevin: e836b5c3019d6c88148e08504376f136cc7cedb1
         - Values: `LOAN`, `INVESTMENT`, `EDUCATION`, `VOUCH`, `BALANCE`
 
 Example:
-``
+````json
 [
     {
         'impact': '-100.00', 'source': 'VOUCH'
     }
 ]
-``
+````
 
 ## Credit
 
@@ -40,11 +40,11 @@ Example:
     - `amount`: Currency value, two decimal places.
    
 Example:
-``
+````json
 {
     'amount': '1000.00'
 }
-``
+````
 
 ## Loan
 
@@ -61,7 +61,7 @@ Example:
     - `id`: ID
    
 Example:
-``
+````json
 [
     {
         "original_amount": "300.00",
@@ -71,7 +71,7 @@ Example:
         "id": 2
     }
 ]
-``
+````
 
 #### Retrieve (Borrower)
 
@@ -86,7 +86,7 @@ Example:
     - `id`: ID
    
 Example:
-``
+````json
 {
     "original_amount": "300.00",
     "paid_amount": "0.00",
@@ -94,7 +94,7 @@ Example:
     "description": "Loan for a palette of Coca Cola.",
     "id": 2
 }
-``
+````
 
 #### Retrieve (Investor/Cosigner)
 
@@ -110,7 +110,7 @@ Example:
     - `id`: ID
    
 Example:
-``
+````json
 {
     "amount": "100.00",
     "borrower": {
@@ -120,4 +120,4 @@ Example:
     "description": "Loan for plastic cups."
     "id': 3
 }
-``
+````
