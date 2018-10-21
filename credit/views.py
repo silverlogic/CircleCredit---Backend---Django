@@ -1,10 +1,11 @@
-from rest_framework import viewsets, mixins
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from credit.models import Credit, CreditImpact
+from credit.models import Credit, CreditImpact, Loan
 from credit.serializers import CreditSerializer, CreditImpactSerializer, VouchSerializer, InvestmentSerializer, \
-    LoanSerializer
+    LoanSerializer, PublicLoanSerializer
 
 
 class CreditViewSet(mixins.RetrieveModelMixin,
@@ -32,7 +33,8 @@ class CreditImpactViewSet(mixins.ListModelMixin,
         return Response(serializer.data)
 
 
-class LoanViewSet(mixins.RetrieveModelMixin,
+class LoanViewSet(mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
@@ -42,6 +44,18 @@ class LoanViewSet(mixins.RetrieveModelMixin,
     def get_queryset(self):
         user = self.request.user
         return user.credit.loans.all()
+
+    def retrieve(self, request, pk):
+        user = self.request.user
+        try:
+            loan = Loan.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if loan.credit.user != user:
+            serializer = PublicLoanSerializer(loan)
+        else:
+            serializer = LoanSerializer(loan)
+        return Response(serializer.data)
 
 
 class VouchViewSet(mixins.RetrieveModelMixin,

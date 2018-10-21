@@ -4,7 +4,7 @@ from rest_framework import routers
 from credit.views import CreditViewSet, CreditImpactViewSet, LoanViewSet, InvestmentViewSet, VouchViewSet
 
 router = routers.SimpleRouter()
-router.register(r'loan', LoanViewSet, 'loan')
+router.register(r'loans', LoanViewSet, 'loan')
 router.register(r'investments', InvestmentViewSet, 'investment')
 router.register(r'vouches', VouchViewSet, 'vouches')
 urlpatterns = router.urls

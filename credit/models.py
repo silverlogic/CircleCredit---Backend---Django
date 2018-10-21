@@ -14,7 +14,8 @@ class Credit(models.Model):
 
 
 CREDIT_IMPACT_SOURCE = (
-('LOAN', 'loan'), ('VOUCH', 'vouch'), ('EDU', 'education'), ('INVEST', 'investment'), ('BALANCE', 'balance'))
+    ('LOAN', 'loan'), ('VOUCH', 'vouch'), ('EDUCATION', 'education'), ('INVESTMENT', 'investment'),
+    ('BALANCE', 'balance'))
 
 
 class CreditImpact(models.Model):
@@ -31,9 +32,20 @@ class Loan(models.Model):
     original_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
     interest = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
     paid_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
+    description = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
         return f'Loan for {self.credit.user.first_name} {self.credit.user.last_name}'
+
+
+class Payment(models.Model):
+    loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='payments')
+    amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
+    payment_date = models.DateTimeField(null=True)
+    deadline = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return f'Payment for Loan {self.loan.pk}'
 
 
 class Vouch(models.Model):

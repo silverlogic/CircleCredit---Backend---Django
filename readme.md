@@ -16,12 +16,12 @@ Kevin: e836b5c3019d6c88148e08504376f136cc7cedb1
 - Properties:
     - `impact`: Currency value, two decimal places, can be negative or positive
     - `source`
-        - Values: `loan`, `investment`, `education`, `vouch`, `balance`
+        - Values: `LOAN`, `INVESTMENT`, `EDUCATION`, `VOUCH`, `BALANCE`
 
 Example:
 ``
 {
-    'impact': '-100.00', 'source': 'vouch'
+    'impact': '-100.00', 'source': 'VOUCH'
 }
 ``
 
@@ -40,3 +40,78 @@ Example:
 }
 ``
 
+## Loan
+
+### List
+
+- Endpoint: `loans/`
+- Method: GET
+- Authentication: Required. Only returns for current user.
+- Properties:
+    - `original_amount`: Currency value, two decimal places.
+    - `paid_amount`: Currency value, two decimal places.
+    - `interest`: Currency value, two decimal places.
+    - `description`: Description, up to 256 characters
+    - `id`: ID
+   
+Example:
+``
+[
+    {
+        "original_amount": "300.00",
+        "paid_amount": "0.00",
+        "interest": "20.00",
+        "description": "Loan for a palette of Coca Cola.",
+        "id": 2
+    }
+]
+``
+
+### Retrieve (Borrower)
+
+- Endpoint: `loans/{id}`
+- Method: GET
+- Authentication: Logged in as borrower
+- Properties:
+    - `original_amount`: Currency value, two decimal places.
+    - `paid_amount`: Currency value, two decimal places.
+    - `interest`: Currency value, two decimal places.
+    - `description`: Description, up to 256 characters
+    - `id`: ID
+   
+Example:
+``
+{
+    "original_amount": "300.00",
+    "paid_amount": "0.00",
+    "interest": "20.00",
+    "description": "Loan for a palette of Coca Cola.",
+    "id": 2
+}
+``
+
+### Retrieve (Investor/Cosigner)
+
+- Endpoint: `loans/{id}`
+- Method: GET
+- Authentication: Logged in as a user who is not the borrower
+- Properties:
+    - `amount`: Currency value, two decimal places.
+    - `borrower`
+        - `firstname`
+        - `lastname`
+    - `description`: Description, up to 256 characters
+    - `id`: ID
+   
+Example:
+``
+{
+    "amount": "100.00",
+    "borrower": {
+        "firstname": "Chris",
+        "lastname": "Johnston"
+    },
+    "description": "Loan for plastic cups."
+    "id': 3
+}
+``
