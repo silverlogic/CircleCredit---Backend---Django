@@ -122,3 +122,20 @@ Example:
     "id": 3
 }
 ````
+
+#### Create Loan
+
+- Endpoint: `loans/`
+- Method: POST
+- Authentication: Logged in as the user you want to create a loan for
+- Properties:
+    - `original_amount`
+    - `description`
+
+Example:
+````json
+{
+	"description": "A loan for soda pop.",
+	"original_amount": "1000.00"
+}
+````

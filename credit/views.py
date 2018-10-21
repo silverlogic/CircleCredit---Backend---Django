@@ -3,6 +3,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from credit.calculations import calculate_interest
 from credit.models import Credit, CreditImpact, Loan
 from credit.serializers import CreditSerializer, CreditImpactSerializer, VouchSerializer, InvestmentSerializer, \
     LoanSerializer, PublicLoanSerializer
@@ -44,6 +45,16 @@ class LoanViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         user = self.request.user
         return user.credit.loans.all()
+
+    def create(self, request):
+        user = self.request.user
+        request.data['credit'] = user.credit.id
+        request.data['interest'] = calculate_interest(user.credit, request.data['original_amount'])
+        serializer = LoanSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk):
         user = self.request.user

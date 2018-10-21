@@ -17,9 +17,13 @@ class CreditImpactSerializer(serializers.ModelSerializer):
 
 
 class LoanSerializer(serializers.ModelSerializer):
+    credit = serializers.PrimaryKeyRelatedField(queryset=Credit.objects.all())
+
     class Meta:
         model = Loan
-        fields = ('original_amount', 'paid_amount', 'interest', 'description', 'id',)
+        fields = ('original_amount', 'paid_amount', 'interest', 'description', 'credit', 'id',)
+        read_only_fields = ('paid_amount', 'id',)
+        extra_kwargs = {'credit': {'write_only': True}}
 
 
 class PublicLoanSerializer(serializers.ModelSerializer):
@@ -35,7 +39,7 @@ class PublicLoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        fields = ('amount', 'borrower', 'description', 'id')
+        fields = ('amount', 'borrower', 'description', 'id',)
 
 
 class VouchSerializer(serializers.ModelSerializer):
