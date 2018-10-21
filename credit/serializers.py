@@ -24,7 +24,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        fields = ('original_amount', 'paid_amount', 'interest', 'description', 'credit', 'id', 'due_date')
+        fields = ('original_amount', 'paid_amount', 'interest', 'status', 'description', 'credit', 'id', 'due_date')
         read_only_fields = ('paid_amount', 'id', 'due_date')
         extra_kwargs = {'credit': {'write_only': True}}
 
@@ -53,7 +53,7 @@ class VouchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vouch
-        fields = ('amount', 'loan', 'vouching_user', 'status', 'id')
+        fields = ('amount', 'loan', 'vouching_user', 'status', 'id',)
         read_only_fields = ('id',)
 
 
@@ -73,7 +73,7 @@ class InvestmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Investment
-        fields = ('original_amount', 'paid_amount', 'interest', 'loan', 'status', 'id')
+        fields = ('original_amount', 'paid_amount', 'interest', 'loan', 'status', 'id', 'credit')
         read_only_fields = ('paid_amount', 'id',)
         extra_kwargs = {'credit': {'write_only': True}}
 

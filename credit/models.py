@@ -84,7 +84,7 @@ class Investment(models.Model):
     paid_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
     description = models.CharField(max_length=256, blank=True)
     due_date = models.DateTimeField(null=True, default=timezone.now() + timedelta(days=30))
-    loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='investments2')
+    loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='investments')
     credit_impact = models.OneToOneField('credit.CreditImpact', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):

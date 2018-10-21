@@ -17,6 +17,7 @@ Rob: `5b14a5a9d3f23f71b5a3d7b80d3b9c4484fb3fee`
 - [Loans](#loan)
 - [Device](#devices)
 - [Users](#users)
+- [Investments](#investments)
 
 ## Credit Factors
 
@@ -147,6 +148,21 @@ Example Request:
 {
 	"description": "A loan for soda pop.",
 	"original_amount": "1000.00"
+}
+````
+
+#### Update (Submit/Accept) Loan
+
+- Endpoint: `loans/{id}`
+- Method: PATCH
+- Authentication: Logged in as the user you want to submit
+- Properties:
+    - `status`
+
+Example Request:
+````json
+{
+	"status": "ACTIVE"
 }
 ````
 
@@ -305,7 +321,8 @@ To accept:
 ````json
 {
   "status": "ACCEPTED",
-  "amount": 100
+  "amount": 100,
+  "investment": 200
 }
 ````
 
@@ -334,3 +351,8 @@ Response:
     "id": 5
 }
 ```
+
+### Investments
+
+Endpoint: `investments/`
+Accepts: GET, RETRIEVE (at `investments/{id}`), and POST (won't need to use--investment is created through vouch right now)
