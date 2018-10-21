@@ -7,7 +7,7 @@ class CreditAdmin(admin.ModelAdmin):
     pass
 
 
-class CreditFactorAdmin(admin.ModelAdmin):
+class CreditImpactAdmin(admin.ModelAdmin):
     pass
 
 
