@@ -1,3 +1,5 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from djmoney.models.fields import MoneyField
 
@@ -27,17 +29,21 @@ class CreditImpact(models.Model):
         return f'Credit impact on {self.credit.user.first_name} {self.credit.user.last_name}\'s Credit'
 
 
-LOAN_STATUS = (('PENDING', 'pending'), ('ACTIVE', 'active',), ('PAID', 'paid'))
+LOAN_STATUS = (('PENDING', 'pending'), ('ACTIVE', 'active',), ('PAID', 'paid'), ('CANCELLED', 'cancelled'))
+
+
+def thirty_day_deadline():
+    return timezone.now() + timedelta(days=30)
 
 
 class Loan(models.Model):
     status = models.CharField(choices=LOAN_STATUS, max_length=12, default='PENDING')
-    credit = models.ForeignKey('credit.Credit', on_delete=models.CASCADE, related_name='loans')
+    credit = models.ForeignKey('credit.Credit', on_delete=models.CASCADE, related_name='loans', null=True)
     original_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
     interest = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
     paid_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
     description = models.CharField(max_length=256, blank=True)
-    due_date = models.DateTimeField(null=True)
+    due_date = models.DateTimeField(null=True, default=thirty_day_deadline)
 
     def __str__(self):
         return f'Loan for {self.credit.user.first_name} {self.credit.user.last_name}'
@@ -47,7 +53,7 @@ class Payment(models.Model):
     loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='payments')
     amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
     payment_date = models.DateTimeField(null=True)
-    deadline = models.DateTimeField(null=True)
+    due_date = models.DateTimeField(null=True)
 
     def __str__(self):
         return f'Payment for Loan {self.loan.pk}'
@@ -70,11 +76,16 @@ class Vouch(models.Model):
         return 'Vouch'
 
 
-class Investment(Loan):
-    """ Inherits credit (lender's), original_amount, interest, paid_amount"""
-    loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='investments')
+class Investment(models.Model):
+    status = models.CharField(choices=LOAN_STATUS, max_length=12, default='PENDING')
+    credit = models.ForeignKey('credit.Credit', on_delete=models.CASCADE, related_name='investments', null=True)
+    original_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
+    interest = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
+    paid_amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', default='0.00')
+    description = models.CharField(max_length=256, blank=True)
+    due_date = models.DateTimeField(null=True, default=timezone.now() + timedelta(days=30))
+    loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='investments2')
     credit_impact = models.OneToOneField('credit.CreditImpact', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f'Investment from {self.credit.user.first_name} {self.credit.user.last_name} to' \
-               f'to {self.loan.credit.user.first_name} {self.loan.credit.user.last_name}'
+        return f'Investment {self.id}'

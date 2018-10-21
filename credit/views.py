@@ -1,12 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
-from fcm_django.models import Device
+from fcm_django.models import FCMDevice
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from credit.calculations import calculate_interest
-from credit.models import Credit, CreditImpact, Loan, Vouch
+from credit.models import Credit, CreditImpact, Loan, Vouch, Investment
 from credit.serializers import CreditSerializer, CreditImpactSerializer, VouchSerializer, InvestmentSerializer, \
     LoanSerializer, PublicLoanSerializer, LoanVouchSerializer
 from users.models import User
@@ -39,7 +39,6 @@ class CreditImpactViewSet(mixins.ListModelMixin,
 
 class LoanViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
                   mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     serializer_class = LoanSerializer
@@ -49,6 +48,12 @@ class LoanViewSet(mixins.ListModelMixin,
         user = self.request.user
         return user.credit.loans.all()
 
+    def list(self, request):
+        user = self.request.user
+        loans = Loan.objects.filter(credit__user=user)
+        serializer = LoanSerializer(loans, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def create(self, request):
         user = self.request.user
         request.data['credit'] = user.credit.id
@@ -56,8 +61,13 @@ class LoanViewSet(mixins.ListModelMixin,
         serializer = LoanSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            credit_impact_serializer = CreditImpactSerializer(data=
+                                                              {'source': 'LOAN', 'credit': user.credit.id,
+                                                               'impact': '-' + str(request.data['original_amount'])})
+            if credit_impact_serializer.is_valid():
+                credit_impact_serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({**serializer.errors, **credit_impact_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk):
         user = self.request.user
@@ -108,27 +118,59 @@ class VouchViewSet(mixins.RetrieveModelMixin,
     def create(self, request):
         user = self.request.user
         serializer = VouchSerializer(data=request.data)
-        # try:
-        #     vouching_user = User.objects.get(pk=request.data['vouching_user'])
-        #     device = Device.objects.get(user=vouching_user)
-        #     device.send_message(title="CreditCircle Vouch Request",
-        #                         body=f"You have a request to vouch for {user.first_name} {user.last_name}.")
-        # except ObjectDoesNotExist:
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.save()
+            try:
+                device = FCMDevice.objects.get(user=instance.vouching_user)
+                device.send_message(data={'id': instance.id})
+            except ObjectDoesNotExist:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def partial_update(self, request, pk):
+        user = self.request.user
+        try:
+            vouch = Vouch.objects.get(id=pk)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        if vouch.vouching_user.id != user.id:
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
+        vouching_status = request.data['status']
+        if vouching_status == 'ACCEPTED':
+            serializer = CreditImpactSerializer(data=
+                                                {'source': 'VOUCH', 'credit': user.credit.id,
+                                                 'impact': '-' + str(request.data['amount'])})
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        vouch.status = vouching_status
+        vouch.save()
+        vouch_serializer = VouchSerializer(vouch)
+        return Response(vouch_serializer.data, status=status.HTTP_200_OK)
 
 
 class InvestmentViewSet(mixins.RetrieveModelMixin,
+                        mixins.ListModelMixin,
                         mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
                         viewsets.GenericViewSet):
     serializer_class = InvestmentSerializer
     permission_classes = (IsAuthenticated,)
+    investment = Investment.objects.all()
 
-    def get_queryset(self):
+    def create(self, request):
         user = self.request.user
-        return user.credit.investments.all()
+        request.data['credit'] = user.credit
+        serializer = InvestmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request):
+        user = self.request.user
+        investments = Investment.objects.filter(credit__user=user)
+        serializer = InvestmentSerializer(investments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

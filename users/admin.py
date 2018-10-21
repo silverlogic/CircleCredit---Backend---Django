@@ -4,11 +4,12 @@ from .models import User
 
 
 class CustomUserAdmin(UserAdmin):
-    fieldsets = (
+    fieldsets = [
         ('Advanced options', {
             'fields': ('first_name', 'last_name', 'email', 'stars', 'job', 'friends',),
         }),
-    )
+    ]
+    fieldsets.insert(0, UserAdmin.fieldsets[0])
     model = User
 
 

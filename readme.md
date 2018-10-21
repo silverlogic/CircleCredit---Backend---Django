@@ -4,13 +4,13 @@ Base URL: http://silverlogic.ngrok.io/api/
 
 Auth Tokens:
 
-Anna: `d01f9cf6936f56b6e09bcf6fbd3ee22f926fa59a`
+Anna: `4b69237fc1d872a28a3afa1ec700ca7f2bdce017`
 
-Chris: `e07af9db0dd265f1424cf7da6e68d2d03bb8260d`	
+Chris: `6719624e606c83676c00e71a8f0010a4b3c9350f`	
 
-Kevin: `e836b5c3019d6c88148e08504376f136cc7cedb1`
+Kevin: `0e49529c28fa56ed3a26d82a571c3bb06ea9b797`
 
-Rob: `fbed0dace38f8dd86b7527c185a59d40ddab1fd1`
+Rob: `5b14a5a9d3f23f71b5a3d7b80d3b9c4484fb3fee`
 
 - [Credit Factors](#credit-factors)
 - [Credit](#credit)
@@ -277,8 +277,6 @@ Example response:
 - Endpoint: `vouches/`
 - Method: POST
 - Authentication: Logged in as loan borrower
-- Properties:
-    - `amount`: **Optional** Default is $20
 
 Example request:
 ````json
