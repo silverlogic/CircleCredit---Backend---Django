@@ -323,10 +323,19 @@ Example request:
 Example response:
 ```json
 {
-    "amount": "20.00",
-    "loan": 3,
-    "vouching_user": 2,
-    "status": "INVITED"
+    "amount": "0.00",
+    "loan": {
+        "amount": "2000.00",
+        "borrower": {
+            "firstname": "Anna",
+            "lastname": "Elde"
+        },
+        "description": "",
+        "id": 1
+    },
+    "vouching_user": 3,
+    "status": "INVITED",
+    "id": 95
 }
 ```
 
