@@ -183,10 +183,10 @@ class VouchViewSet(mixins.RetrieveModelMixin,
         except ObjectDoesNotExist:
             return Response('Not Found', status=status.HTTP_404_NOT_FOUND)
         if vouch.loan.credit.user != user or vouch.vouching_user != user:
-            Response('Forbidden', status=status.HTTP_403_FORBIDDEN)
+            return Response('Forbidden', status=status.HTTP_403_FORBIDDEN)
         else:
             serializer = VouchSerializer(vouch)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request):
         user = self.request.user
