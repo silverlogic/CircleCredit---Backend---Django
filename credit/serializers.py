@@ -12,7 +12,7 @@ class CreditSerializer(serializers.ModelSerializer):
 class CreditImpactSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditImpact
-        fields = ('impact',)
+        fields = ('impact', 'source')
 
 
 class LoanSerializer(serializers.ModelSerializer):

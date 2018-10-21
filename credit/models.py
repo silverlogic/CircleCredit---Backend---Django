@@ -13,9 +13,14 @@ class Credit(models.Model):
         return f'Credit for {self.user.first_name} {self.user.last_name}'
 
 
+CREDIT_IMPACT_SOURCE = (
+('LOAN', 'loan'), ('VOUCH', 'vouch'), ('EDU', 'education'), ('INVEST', 'investment'), ('BALANCE', 'balance'))
+
+
 class CreditImpact(models.Model):
     credit = models.ForeignKey('credit.Credit', on_delete=models.CASCADE, related_name="credit_impacts")
     impact = MoneyField(max_digits=19, decimal_places=2, default_currency='USD')
+    source = models.CharField(choices=CREDIT_IMPACT_SOURCE, max_length=12, blank=True)
 
     def __str__(self):
         return f'Credit impact on {self.credit.user.first_name} {self.credit.user.last_name}\'s Credit'

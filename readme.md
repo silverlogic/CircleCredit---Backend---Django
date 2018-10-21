@@ -10,12 +10,12 @@ BASE URL: http://silverlogic.ngrok.io/api/
 - Properties:
     - `impact`: Currency value, two decimal places, can be negative or positive
     - `source`
-        - Values: `vouches`, `investments`, `loans`, `quiz`, `credit-score`, `balance`
+        - Values: `loan`, `investment`, `education`, `vouch`, `balance`
 
 Example:
 ``
 {
-    'impact': '-100.00', 'source': 'vouches'
+    'impact': '-100.00', 'source': 'vouch'
 }
 ``
 
