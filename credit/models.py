@@ -60,7 +60,7 @@ class Vouch(models.Model):
     status = models.CharField(choices=VOUCH_STATUS, max_length=12, default='invited')
     amount = MoneyField(max_digits=19, decimal_places=2, default_currency='USD', blank=True)
     loan = models.ForeignKey('credit.Loan', on_delete=models.SET_NULL, null=True, related_name='vouches')
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)
+    vouching_user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=False)
     credit_impact = models.OneToOneField('credit.CreditImpact', on_delete=models.SET_NULL, null=True)
 
     class Meta:

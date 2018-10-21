@@ -204,7 +204,7 @@ Example response:
     {
         "amount": "100.00",
         "loan": 2,
-        "user": {
+        "vouching_user": {
             "name": "Chris Johnston",
             "stars": 3,
             "job": "Soda Vendor",
@@ -214,3 +214,93 @@ Example response:
     }
 ]
 ````
+
+#### List User's Current Vouches
+
+- Endpoint: `vouches/`
+- Method: GET
+- Authentication: Logged in as vouching user
+
+Example response:
+```json
+[
+    {
+        "amount": "100.00",
+        "loan": {
+            "amount": "100.00",
+            "borrower": {
+                "firstname": "Chris",
+                "lastname": "Johnston"
+            },
+            "description": "Loan for plastic cups.",
+            "id": 3
+        },
+        "vouching_user": 1,
+        "status": "INVITED",
+        "id": 5
+    }
+]
+```
+
+#### Invite to Vouch for a Loan
+
+- Endpoint: `vouches/`
+- Method: POST
+- Authentication: Logged in as loan borrower
+
+Example request:
+````json
+{
+	"vouching_user": 2,
+	"amount": 100,
+	"loan": 3
+}
+````
+
+Example response:
+```json
+{
+    "amount": "100.00",
+    "loan": 3,
+    "vouching_user": 2,
+    "status": "invited"
+}
+```
+
+### Accept or Decline to Vouch
+- Endpoint: `vouches/{id}/`
+- Method: PATCH
+- Authentication: Logged in as vouching user
+
+To accept:
+````json
+{
+  "status": "ACCEPTED"
+}
+````
+
+To decline:
+````json
+{
+  "status": "DECLINED"
+}
+````
+
+Response:
+```json
+{
+    "amount": "100.00",
+    "loan": {
+        "amount": "100.00",
+        "borrower": {
+            "firstname": "Chris",
+            "lastname": "Johnston"
+        },
+        "description": "Loan for plastic cups.",
+        "id": 3
+    },
+    "vouching_user": 1,
+    "status": "ACCEPTED",
+    "id": 5
+}
+```

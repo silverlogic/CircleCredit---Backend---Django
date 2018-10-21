@@ -44,16 +44,24 @@ class PublicLoanSerializer(serializers.ModelSerializer):
 
 
 class VouchSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super(VouchSerializer, self).to_representation(instance)
+        data['loan'] = PublicLoanSerializer(instance.loan).data
+        return data
+
     class Meta:
         model = Vouch
-        fields = ('amount', 'loan',)
+        fields = ('amount', 'loan', 'vouching_user', 'status', 'id')
+        read_only_fields = ('id',)
+
 
 class LoanVouchSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    vouching_user = UserSerializer()
 
     class Meta:
         model = Vouch
-        fields = ('amount', 'loan', 'user', 'status')
+        fields = ('amount', 'loan', 'vouching_user', 'status')
+
 
 class InvestmentSerializer(serializers.ModelSerializer):
     class Meta:

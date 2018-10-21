@@ -99,7 +99,7 @@ class VouchViewSet(mixins.RetrieveModelMixin,
 
     def list(self, request):
         user = self.request.user
-        vouches = Vouch.objects.filter(user=user)
+        vouches = Vouch.objects.filter(vouching_user=user)
         serializer = VouchSerializer(vouches, many=True)
         return Response(serializer.data)
 
@@ -111,10 +111,9 @@ class VouchViewSet(mixins.RetrieveModelMixin,
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request):
-        pass
+    # def update(self, request, pk):
+    #     pass
         # If accepted, add credit factors
-        # If declined, delete object
 
 
 class InvestmentViewSet(mixins.RetrieveModelMixin,
