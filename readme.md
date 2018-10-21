@@ -306,7 +306,8 @@ Example response:
 To accept:
 ````json
 {
-  "status": "ACCEPTED"
+  "status": "ACCEPTED",
+  "amount": 100
 }
 ````
 

@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from fcm_django.models import Device
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,7 @@ from credit.calculations import calculate_interest
 from credit.models import Credit, CreditImpact, Loan, Vouch
 from credit.serializers import CreditSerializer, CreditImpactSerializer, VouchSerializer, InvestmentSerializer, \
     LoanSerializer, PublicLoanSerializer, LoanVouchSerializer
+from users.models import User
 
 
 class CreditViewSet(mixins.RetrieveModelMixin,
@@ -104,16 +106,20 @@ class VouchViewSet(mixins.RetrieveModelMixin,
         return Response(serializer.data)
 
     def create(self, request):
-        # SEND PUSH TO FIREBASE
+        user = self.request.user
         serializer = VouchSerializer(data=request.data)
+        # try:
+        #     vouching_user = User.objects.get(pk=request.data['vouching_user'])
+        #     device = Device.objects.get(user=vouching_user)
+        #     device.send_message(title="CreditCircle Vouch Request",
+        #                         body=f"You have a request to vouch for {user.first_name} {user.last_name}.")
+        # except ObjectDoesNotExist:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def update(self, request, pk):
-    #     pass
-        # If accepted, add credit factors
 
 
 class InvestmentViewSet(mixins.RetrieveModelMixin,
