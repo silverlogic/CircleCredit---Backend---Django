@@ -33,8 +33,38 @@ class CreditViewSet(mixins.RetrieveModelMixin,
 
 def synchrony_credit_score(request):
     response = requests.get('https://api-stg.syf.com/m2020/credit/customers/1/profile',
-                             headers={'Authorization': f'Bearer {settings.SYNCHRONY_ACCESS_TOKEN}'})
+                            headers={'Authorization': f'Bearer {settings.SYNCHRONY_ACCESS_TOKEN}'})
     return JsonResponse(response.json())
+
+
+def verify_document(request):
+    headers = {"Content-Type": "multipart/form-data", "boundary": "VISA_MESSAGE_BOUNDARY"}
+    body = """
+    --VISA_MESSAGE_BOUNDARY
+    Content-Disposition: form-data; name="jsonMessage"
+    Content-Type: application/json; charset=UTF-8
+    Content-Transfer-Encoding: 8bit
+    {"messageTraceId":"843810ae-d2d2-468d-a302-b516cadfd24a","documentCountryCode":"US"}
+    --VISA_MESSAGE_BOUNDARY
+    Content-Disposition: form-data; name="documentFront"; filename="driversLicense.jpg"
+    Content-Type: image/jpeg
+    Content-Transfer-Encoding: binary
+      [Binary document front goes here]
+    --VISA_MESSAGE_BOUNDARY
+    Content-Disposition: form-data; name="documentBack"; filename="driversLicenseBack.jpg"
+     Content-Type: image/jpeg
+    Content-Transfer-Encoding: binary
+       [Binary document back goes here]
+    --VISA_MESSAGE_BOUNDARY"
+    """
+    response = requests.post('https://sandbox.api.visa.com/identitydocuments/v1/documentauthentication',
+                             verify=(settings.VISA_CA_CERT),
+                             cert=(settings.VISA_CLIENT_CERT, settings.VISA_PRIVATE_KEY),
+                             headers=headers,
+                             auth=(settings.VISA_USER_ID, settings.VISA_USER_PASSWORDA),
+                             data=body)
+    return JsonResponse(response.json())
+
 
 class CreditImpactViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
